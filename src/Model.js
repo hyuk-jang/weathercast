@@ -1,8 +1,6 @@
-'use strict';
-
 const _ = require('lodash');
 
-const BU = require('base-util-jh').baseUtil;
+const {BU} = require('base-util-jh');
 const BiModule = require('./BiModule');
 
 const Control = require('./Control');
@@ -15,7 +13,6 @@ class Model {
     this.weatherLocationSeq = controller.config.locationSeq;
     this.locationInfo = controller.config.locationInfo;
 
-
     // 원데이터는 아님. {x, y, announceData, weathercast} 내장
     this.weatherCastData = {};
     this.biModule = new BiModule(controller.config.dbInfo);
@@ -23,19 +20,20 @@ class Model {
 
   /**
    * 기상청 날씨 정제
-   * @param {{x: number, y: number, announceDate: Date, weatherCast: Array.<weathercast>}} weatherCastData 
+   * @param {{x: number, y: number, announceDate: Date, weatherCast: Array.<weathercast>}} weatherCastData
    */
-  async onData(weatherCastData){
+  async onData(weatherCastData) {
     // BU.CLI('onData');
-    let tempStorage = new this.biModule.TempStorage();
-    let prevForecastList = await this.biModule.getPrevWeatherCast(this.weatherLocationSeq);
+    const tempStorage = new this.biModule.TempStorage();
+    const prevForecastList = await this.biModule.getPrevWeatherCast(this.weatherLocationSeq);
     // BU.CLI(prevForecastList);
 
-    _(prevForecastList).forEach(currentItem => _.set(currentItem, 'applydate', BU.convertDateToText(currentItem.applydate)));
+    _(prevForecastList).forEach(currentItem =>
+      _.set(currentItem, 'applydate', BU.convertDateToText(currentItem.applydate)),
+    );
     // BU.CLI('prevForecastList');
     tempStorage.setExistStorage(prevForecastList);
 
-    
     weatherCastData.weatherCast.forEach(currentItem => {
       // FK 확장
       _.extend(currentItem, {weather_location_seq: this.weatherLocationSeq});
@@ -44,17 +42,21 @@ class Model {
     this.weatherCastData = weatherCastData;
     // BU.CLIN(tempStorage.getFinalStorage());
 
-    let finalStorage = tempStorage.getFinalStorage();
-    let writedate = BU.convertDateToText(new Date());
+    const finalStorage = tempStorage.getFinalStorage();
+    const writedate = BU.convertDateToText(new Date());
     finalStorage.insertObjList.forEach(currentItem => {
       _.extend(currentItem, {writedate});
     });
     // BU.CLI(finalStorage);
 
-    const resultDoQuery = await this.biModule.doQuery(tempStorage, 'kma_data', 'kma_data_seq', false);
+    const resultDoQuery = await this.biModule.doQuery(
+      tempStorage,
+      'kma_data',
+      ['kma_data_seq'],
+      false,
+    );
     return resultDoQuery;
   }
-
 
   // NOTE 차후 내일 강수량을 얻어올 필요가 있다면 수정 필요
   // get tomorrowPop() {

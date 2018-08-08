@@ -1,27 +1,31 @@
-const BU = require('base-util-jh').baseUtil;
+const {BU} = require('base-util-jh');
 
-const bmjh = require('base-model-jh');
+const {BM, TempStorage} = require('base-model-jh');
 
-class BiModule extends bmjh.BM {
+class BiModule extends BM {
   constructor(dbInfo) {
     super(dbInfo);
 
-    this.TempStorage = bmjh.TempStorage;
-
+    this.TempStorage = TempStorage;
   }
 
   /**
    * 저장소에 저장된 내역을 기준으로 insert, update 수행 후 Promise 반환
-   * @param {Object} storage TempStroage Class Object
-   * @param {String} tblName 
-   * @param {String} updateKey 
+   * @param {TempStorage} storage TempStroage Class Object
+   * @param {string} tblName
+   * @param {string[]} updateKeyList
    * @return {Promise}
    */
-  async doQuery(storage, tblName, updateKey, hasViewQuery) {
-    let finalStorage = storage.getFinalStorage();
+  async doQuery(storage, tblName, updateKeyList, hasViewQuery) {
+    const finalStorage = storage.getFinalStorage();
     // BU.CLI(finalStorage);
     await this.setTables(tblName, finalStorage.insertObjList, hasViewQuery);
-    await this.updateTablesByPool(tblName, updateKey, finalStorage.updateObjList);
+    await this.biModule.updateTablesByPool(
+      tblName,
+      updateKeyList,
+      finalStorage.updateObjList,
+      hasViewQuery,
+    );
 
     return true;
   }
@@ -31,28 +35,28 @@ class BiModule extends bmjh.BM {
    * @param {number} seq
    */
   getPrevWeatherCast(seq) {
-    let sql = `SELECT * FROM kma_data WHERE applydate > CURDATE() AND weather_location_seq = ${seq} ORDER BY kma_data_seq DESC  LIMIT 24`;
+    const sql = `SELECT * FROM kma_data WHERE applydate > CURDATE() AND weather_location_seq = ${seq} ORDER BY kma_data_seq DESC  LIMIT 24`;
 
     return this.db.single(sql, '', false);
   }
 
-
   // Controller에서 요청 시
   // TODO 예전에 쓰던 내일 우천 확율 구하기.
   getTomorrowPop(controllerNum) {
-    var sql = ' SELECT Max(pop) Max FROM';
+    let sql = ' SELECT Max(pop) Max FROM';
     sql += ' (';
     sql += ' SELECT A.saltern_info_seq, A.weather_location_seq ';
-    sql += ' ,(SELECT B.x FROM weather_location B WHERE B.weather_location_seq = A.weather_location_seq) x';
-    sql += ' ,(SELECT B.y FROM weather_location B WHERE B.weather_location_seq = A.weather_location_seq) y';
+    sql +=
+      ' ,(SELECT B.x FROM weather_location B WHERE B.weather_location_seq = A.weather_location_seq) x';
+    sql +=
+      ' ,(SELECT B.y FROM weather_location B WHERE B.weather_location_seq = A.weather_location_seq) y';
     sql += ' FROM saltern_info A ';
-    sql += ' WHERE A.saltern_info_seq = ' + controllerNum + ' ';
+    sql += ` WHERE A.saltern_info_seq = ${controllerNum} `;
     sql += ' ) C';
     sql += ' LEFT OUTER JOIN kma_data D ON C.x = D.x AND D.y = C.y';
-    sql += ' WHERE DATE_FORMAT(applydate, \'%Y-%m-%d\') = DATE_ADD(CURDATE(), INTERVAL 1 DAY)';
+    sql += " WHERE DATE_FORMAT(applydate, '%Y-%m-%d') = DATE_ADD(CURDATE(), INTERVAL 1 DAY)";
 
     return this.db.single(sql);
   }
-
 }
 module.exports = BiModule;
