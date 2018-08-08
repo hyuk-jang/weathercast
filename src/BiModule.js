@@ -20,12 +20,7 @@ class BiModule extends BM {
     const finalStorage = storage.getFinalStorage();
     // BU.CLI(finalStorage);
     await this.setTables(tblName, finalStorage.insertObjList, hasViewQuery);
-    await this.biModule.updateTablesByPool(
-      tblName,
-      updateKeyList,
-      finalStorage.updateObjList,
-      hasViewQuery,
-    );
+    await this.updateTablesByPool(tblName, updateKeyList, finalStorage.updateObjList, hasViewQuery);
 
     return true;
   }

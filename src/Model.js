@@ -36,16 +36,17 @@ class Model {
 
     weatherCastData.weatherCast.forEach(currentItem => {
       // FK 확장
-      _.extend(currentItem, {weather_location_seq: this.weatherLocationSeq});
+      _.assign(currentItem, {weather_location_seq: this.weatherLocationSeq});
       tempStorage.addStorage(currentItem, 'applydate', 'kma_data_seq');
     });
     this.weatherCastData = weatherCastData;
+    // BU.CLI(this.weatherCastData);
     // BU.CLIN(tempStorage.getFinalStorage());
 
     const finalStorage = tempStorage.getFinalStorage();
     const writedate = BU.convertDateToText(new Date());
     finalStorage.insertObjList.forEach(currentItem => {
-      _.extend(currentItem, {writedate});
+      _.assign(currentItem, {writedate});
     });
     // BU.CLI(finalStorage);
 
