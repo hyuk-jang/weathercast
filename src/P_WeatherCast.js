@@ -1,5 +1,5 @@
 const xml2js = require('xml2js');
-const cron = require('cron');
+const cron = require('node-cron');
 const http = require('http');
 const _ = require('lodash');
 
@@ -26,6 +26,16 @@ class PWeatherCast {
         // BU.CLI('Stop')
         this.cronScheduler.stop();
       }
+
+      // 30분마다 요청
+      this.cronScheduler = cron.schedule('*/30 * * * *', () => {
+        this.controller.config.hasDev
+          ? this.TestRequestWeatherCastForFile()
+          : this.requestWeatherCast();
+      });
+
+      this.cronScheduler.start();
+
       // 30분마다 요청
       this.cronScheduler = new cron.CronJob({
         cronTime: '0 */30 * * * *',
@@ -72,7 +82,7 @@ class PWeatherCast {
             // BU.CLI(result)
             BU.writeFile('./log/weathercast.txt', result, 'w');
             // 모델화 시킴
-            const weatherCastModel = this._makeWeatherCastModel(result, callback);
+            const weatherCastModel = this.makeWeatherCastModel(result, callback);
             return this.controller.processOnData(null, weatherCastModel);
           });
         });
@@ -87,7 +97,7 @@ class PWeatherCast {
       if (err) {
         return this.controller.processOnData(err);
       }
-      const weatherCastModel = this._makeWeatherCastModel(JSON.parse(result));
+      const weatherCastModel = this.makeWeatherCastModel(JSON.parse(result));
       return this.controller.processOnData(null, weatherCastModel);
     });
   }
@@ -98,7 +108,7 @@ class PWeatherCast {
    * @param {*} weatherCastInfo
    * @return {weathercastModel}
    */
-  _makeWeatherCastModel(weatherCastInfo) {
+  makeWeatherCastModel(weatherCastInfo) {
     const weatherCastObjHeader = weatherCastInfo.wid.header[0];
     const weatherCastObjBody = weatherCastInfo.wid.body[0];
     const announceDate = BU.splitStrDate(weatherCastObjHeader.tm);
@@ -142,7 +152,7 @@ class PWeatherCast {
       const weatherCastData = {
         // day: castInfo.day[0], // 발표 날
         // hour: castInfo.hour[0], // 발표 시
-        applydate: this._calcApplyDate(announceDate, castInfo), // 적용시간
+        applydate: this.calcApplyDate(announceDate, castInfo), // 적용시간
         temp: castInfo.temp[0], // 날씨
         pty: castInfo.pty[0], // [없음(0), 비(1), 비 / 눈(2), 눈(3)]
         sky: castInfo.sky[0], // ① 1 : 맑음 ② 2 : 구름조금 ③ 3 : 구름많음 ④ 4 : 흐림
@@ -162,7 +172,7 @@ class PWeatherCast {
   }
 
   // 발표 시각을 기준으로 적용중인 시간을 계산하여 Date 반환
-  _calcApplyDate(baseDate, targetDate) {
+  calcApplyDate(baseDate, targetDate) {
     const applydate = new Date(baseDate);
     const day = Number(targetDate.day[0]);
     const hour = Number(targetDate.hour[0]);

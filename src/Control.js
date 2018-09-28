@@ -1,5 +1,3 @@
-const _ = require('lodash');
-
 const EventEmitter = require('events');
 const {BU} = require('base-util-jh');
 const PWeatherCast = require('./P_WeatherCast.js');
