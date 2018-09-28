@@ -35,18 +35,6 @@ class PWeatherCast {
       });
 
       this.cronScheduler.start();
-
-      // 30분마다 요청
-      this.cronScheduler = new cron.CronJob({
-        cronTime: '0 */30 * * * *',
-        onTick: () => {
-          this.controller.config.hasDev
-            ? this.TestRequestWeatherCastForFile()
-            : this.requestWeatherCast();
-          // this.requestWeatherCast();
-        },
-        start: true,
-      });
       return true;
     } catch (error) {
       throw error;
