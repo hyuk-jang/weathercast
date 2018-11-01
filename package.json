@@ -30,8 +30,8 @@
     "prettier": "^1.14.0"
   },
   "dependencies": {
-    "base-model-jh": "^1.2.3",
-    "base-util-jh": "^1.1.16",
+    "base-model-jh": "^1.2.4",
+    "base-util-jh": "^1.1.18",
     "lodash": "^4.17.11",
     "node-cron": "^2.0.1",
     "xml2js": "^0.4.19"
