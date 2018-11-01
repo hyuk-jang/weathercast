@@ -52,7 +52,7 @@ class Model {
 
     const resultDoQuery = await this.biModule.doQuery(
       tempStorage,
-      'kma_data',
+      'wc_kma_data',
       ['kma_data_seq'],
       false,
     );

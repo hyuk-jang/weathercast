@@ -50,32 +50,36 @@ class PWeatherCast {
       path: `/wid/queryDFS.jsp?gridx=${this.locationX}&gridy=${this.locationY}`,
     };
 
-    http
-      .request(options, res => {
-        let output = '';
-        // BU.CLI(options.host + ':' + res.statusCode);
-        res.setEncoding('utf8');
+    try {
+      http
+        .request(options, res => {
+          let output = '';
+          // BU.CLI(options.host + ':' + res.statusCode);
+          res.setEncoding('utf8');
 
-        res.on('data', chunk => {
-          output += chunk;
-        });
-
-        res.on('end', () => {
-          const parser = new xml2js.Parser();
-          parser.parseString(output, (err, result) => {
-            if (err) {
-              return this.controller.processOnData(err);
-            }
-            // TestRequestWeatherCastForFile을 사용하기 위한 파일 저장
-            // BU.CLI(result)
-            BU.writeFile('./log/weathercast.txt', result, 'w');
-            // 모델화 시킴
-            const weatherCastModel = this.makeWeatherCastModel(result, callback);
-            return this.controller.processOnData(null, weatherCastModel);
+          res.on('data', chunk => {
+            output += chunk;
           });
-        });
-      })
-      .end();
+
+          res.on('end', () => {
+            const parser = new xml2js.Parser();
+            parser.parseString(output, (err, result) => {
+              if (err) {
+                return this.controller.processOnData(err);
+              }
+              // TestRequestWeatherCastForFile을 사용하기 위한 파일 저장
+              // BU.CLI(result)
+              // BU.writeFile('./log/weathercast.txt', result, 'w');
+              // 모델화 시킴
+              const weatherCastModel = this.makeWeatherCastModel(result, callback);
+              return this.controller.processOnData(null, weatherCastModel);
+            });
+          });
+        })
+        .end();
+    } catch (error) {
+      BU.logFile(_.get(error, 'stack', 'requestWeatherCast'));
+    }
   }
 
   // TEST: 테스트용 동네예보 파일 읽어오기
@@ -97,6 +101,9 @@ class PWeatherCast {
    * @return {weathercastModel}
    */
   makeWeatherCastModel(weatherCastInfo) {
+    if (_.get(weatherCastInfo, 'wid.header', []).length === 0) {
+      throw new Error('weather data is broken');
+    }
     const weatherCastObjHeader = weatherCastInfo.wid.header[0];
     const weatherCastObjBody = weatherCastInfo.wid.body[0];
     const announceDate = BU.splitStrDate(weatherCastObjHeader.tm);

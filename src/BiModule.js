@@ -1,5 +1,3 @@
-const {BU} = require('base-util-jh');
-
 const {BM, TempStorage} = require('base-model-jh');
 
 class BiModule extends BM {
@@ -30,7 +28,7 @@ class BiModule extends BM {
    * @param {number} seq
    */
   getPrevWeatherCast(seq) {
-    const sql = `SELECT * FROM kma_data WHERE applydate > CURDATE() AND weather_location_seq = ${seq} ORDER BY kma_data_seq DESC  LIMIT 24`;
+    const sql = `SELECT * FROM wc_kma_data WHERE applydate > CURDATE() AND weather_location_seq = ${seq} ORDER BY kma_data_seq DESC  LIMIT 24`;
 
     return this.db.single(sql, '', false);
   }
