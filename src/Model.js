@@ -1,6 +1,6 @@
 const _ = require('lodash');
 
-const {BU} = require('base-util-jh');
+const { BU } = require('base-util-jh');
 const BiModule = require('./BiModule');
 
 const Control = require('./Control');
@@ -23,32 +23,26 @@ class Model {
    * @param {{x: number, y: number, announceDate: Date, weatherCast: Array.<weathercast>}} weatherCastData
    */
   async onData(weatherCastData) {
-    // BU.CLI('onData');
     const tempStorage = new this.biModule.TempStorage();
     const prevForecastList = await this.biModule.getPrevWeatherCast(this.weatherLocationSeq);
-    // BU.CLI(prevForecastList);
 
     _(prevForecastList).forEach(currentItem =>
       _.set(currentItem, 'applydate', BU.convertDateToText(currentItem.applydate)),
     );
-    // BU.CLI('prevForecastList');
     tempStorage.setExistStorage(prevForecastList);
 
     weatherCastData.weatherCast.forEach(currentItem => {
       // FK 확장
-      _.assign(currentItem, {weather_location_seq: this.weatherLocationSeq});
+      _.assign(currentItem, { weather_location_seq: this.weatherLocationSeq });
       tempStorage.addStorage(currentItem, 'applydate', 'kma_data_seq');
     });
     this.weatherCastData = weatherCastData;
-    // BU.CLI(this.weatherCastData);
-    // BU.CLIN(tempStorage.getFinalStorage());
 
     const finalStorage = tempStorage.getFinalStorage();
     const writedate = BU.convertDateToText(new Date());
     finalStorage.insertObjList.forEach(currentItem => {
-      _.assign(currentItem, {writedate});
+      _.assign(currentItem, { writedate });
     });
-    // BU.CLI(finalStorage);
 
     const resultDoQuery = await this.biModule.doQuery(
       tempStorage,

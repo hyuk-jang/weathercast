@@ -3,7 +3,7 @@ const cron = require('node-cron');
 const http = require('http');
 const _ = require('lodash');
 
-const BU = require('base-util-jh').baseUtil;
+const { BU } = require('base-util-jh');
 
 const Control = require('./Control');
 
@@ -23,7 +23,6 @@ class PWeatherCast {
   runCronWeatherCast() {
     try {
       if (this.cronScheduler !== null) {
-        // BU.CLI('Stop')
         this.cronScheduler.stop();
       }
 
@@ -43,8 +42,6 @@ class PWeatherCast {
 
   // 날씨 정보 요청
   requestWeatherCast(callback) {
-    // BU.CLI('requestWeatherCast');
-    // BU.debugConsole();
     const options = {
       host: 'www.kma.go.kr',
       path: `/wid/queryDFS.jsp?gridx=${this.locationX}&gridy=${this.locationY}`,
@@ -54,7 +51,6 @@ class PWeatherCast {
       http
         .request(options, res => {
           let output = '';
-          // BU.CLI(options.host + ':' + res.statusCode);
           res.setEncoding('utf8');
 
           res.on('data', chunk => {
@@ -68,7 +64,6 @@ class PWeatherCast {
                 return this.controller.processOnData(err);
               }
               // TestRequestWeatherCastForFile을 사용하기 위한 파일 저장
-              // BU.CLI(result)
               // BU.writeFile('./log/weathercast.txt', result, 'w');
               // 모델화 시킴
               const weatherCastModel = this.makeWeatherCastModel(result, callback);
@@ -84,7 +79,6 @@ class PWeatherCast {
 
   // TEST: 테스트용 동네예보 파일 읽어오기
   TestRequestWeatherCastForFile() {
-    // BU.CLI('TestRequestWeatherCastForFile');
     BU.readFile('./log/weathercast.txt', '', (err, result) => {
       if (err) {
         return this.controller.processOnData(err);

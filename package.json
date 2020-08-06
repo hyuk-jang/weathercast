@@ -1,6 +1,6 @@
 {
   "name": "weather-cast",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "",
   "main": "index.js",
   "directories": {
@@ -15,25 +15,25 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "chai": "^4.1.2",
-    "docdash": "^0.4.0",
-    "dotenv": "^6.0.0",
-    "eslint": "^5.3.0",
-    "eslint-config-airbnb": "^17.0.0",
-    "eslint-config-prettier": "^2.9.0",
-    "eslint-plugin-import": "^2.13.0",
-    "eslint-plugin-jsx-a11y": "^6.1.1",
-    "eslint-plugin-prettier": "^2.6.2",
-    "eslint-plugin-react": "^7.10.0",
-    "jsdoc": "^3.5.5",
-    "mocha": "^5.2.0",
-    "prettier": "^1.14.0"
+    "chai": "^4.2.0",
+    "docdash": "^1.2.0",
+    "dotenv": "^8.2.0",
+    "eslint": "^7.6.0",
+    "eslint-config-airbnb": "^18.2.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jsx-a11y": "^6.3.1",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-react": "^7.20.5",
+    "jsdoc": "^3.6.5",
+    "mocha": "^8.1.1",
+    "prettier": "^2.0.5"
   },
   "dependencies": {
-    "base-model-jh": "^1.2.4",
-    "base-util-jh": "^1.1.19",
-    "lodash": "^4.17.11",
-    "node-cron": "^2.0.1",
-    "xml2js": "^0.4.19"
+    "base-model-jh": "^1.2.9",
+    "base-util-jh": "^1.2.6",
+    "lodash": "^4.17.19",
+    "node-cron": "^2.0.3",
+    "xml2js": "^0.4.23"
   }
 }

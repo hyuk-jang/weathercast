@@ -1,4 +1,4 @@
-const {BM, TempStorage} = require('base-model-jh');
+const { BM, TempStorage } = require('base-model-jh');
 
 class BiModule extends BM {
   constructor(dbInfo) {

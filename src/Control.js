@@ -5,7 +5,6 @@ const Model = require('./Model');
 
 const config = require('./config');
 
-// class WeatherCastControl {
 class Control extends EventEmitter {
   /** @param {config} mainConfig */
   constructor(mainConfig = config) {
@@ -22,7 +21,6 @@ class Control extends EventEmitter {
 
   // 초기 구동 시
   init() {
-    // BU.CLI('weatherCast init',this.config)
     // TEST: file 로딩
     return new Promise(resolve => {
       if (this.config.hasDev) {
@@ -43,7 +41,6 @@ class Control extends EventEmitter {
 
   // 내일 강수확율 가져오기
   getTomorrowPop() {
-    // BU.CLI(this.model.tomorrowPop)
     return this.model.tomorrowPop;
   }
 
@@ -53,20 +50,15 @@ class Control extends EventEmitter {
    * @param {weathercastModel} weatherCastData
    */
   async processOnData(err, weatherCastData) {
-    // BU.CLIS(err, weatherCastData);
     if (err) {
       BU.logFile(err);
-      // BU.CLI('ERROR updateWeatherCast', `seq: ${this.config.locationSeq}`);
-      this.emit('updateWeatherCast', _.get(err, 'stack', 'processOnData'));
+      this.emit('updateWeatherCast', err.stack);
     } else {
       // 모델에 토스
       try {
         const resultOnData = await this.model.onData(weatherCastData);
-        // BU.CLI('DONE updateWeatherCast', `seq: ${this.config.locationSeq}`);
         this.emit('updateWeatherCast', null, resultOnData);
       } catch (error) {
-        BU.CLI('ERROR updateWeatherCast', `seq: ${this.config.locationSeq}`);
-        // this.emit('updateWeatherCast', error);
         BU.logFile(error);
       }
     }
