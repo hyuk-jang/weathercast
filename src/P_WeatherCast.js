@@ -1,6 +1,6 @@
 const xml2js = require('xml2js');
 const cron = require('node-cron');
-const http = require('http');
+const https = require('https');
 const _ = require('lodash');
 
 const { BU } = require('base-util-jh');
@@ -21,23 +21,19 @@ class PWeatherCast {
 
   // Cron 구동시킬 시간
   runCronWeatherCast() {
-    try {
-      if (this.cronScheduler !== null) {
-        this.cronScheduler.stop();
-      }
-
-      // 30분마다 요청
-      this.cronScheduler = cron.schedule('*/30 * * * *', () => {
-        this.controller.config.hasDev
-          ? this.TestRequestWeatherCastForFile()
-          : this.requestWeatherCast();
-      });
-
-      this.cronScheduler.start();
-      return true;
-    } catch (error) {
-      throw error;
+    if (this.cronScheduler !== null) {
+      this.cronScheduler.stop();
     }
+
+    // 30분마다 요청
+    this.cronScheduler = cron.schedule('*/30 * * * *', () => {
+      this.controller.config.hasDev
+        ? this.TestRequestWeatherCastForFile()
+        : this.requestWeatherCast();
+    });
+
+    this.cronScheduler.start();
+    return true;
   }
 
   // 날씨 정보 요청
@@ -48,7 +44,7 @@ class PWeatherCast {
     };
 
     try {
-      http
+      https
         .request(options, res => {
           let output = '';
           res.setEncoding('utf8');

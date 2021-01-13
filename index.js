@@ -11,7 +11,7 @@ if (require !== undefined && require.main === module) {
   require('dotenv').config();
 
   const _ = require('lodash');
-  const {BU} = require('base-util-jh');
+  const { BU } = require('base-util-jh');
   const config = require('./src/config');
   config.dbInfo = {
     host: process.env.DB_HOST,
